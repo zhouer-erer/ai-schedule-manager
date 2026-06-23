@@ -208,3 +208,14 @@ brew install tesseract tesseract-lang
 ## 许可证
 
 MIT License
+<img width="2201" height="1355" alt="image" src="https://github.com/user-attachments/assets/94d4c25e-50c9-4b84-8edb-f4e1d9e628d9" />
+<img width="2251" height="1367" alt="image" src="https://github.com/user-attachments/assets/eca0ecb6-213b-4b86-9079-d9d2e36065e0" />
+<img width="2359" height="1352" alt="image" src="https://github.com/user-attachments/assets/0d1da4ee-0eae-47b3-b2d7-f9d211cb8deb" />
+<img width="2209" height="1330" alt="image" src="https://github.com/user-attachments/assets/790f92df-0d0c-4cc7-bb4b-b4c51938a8b2" />
+
+
+
+
+
+
+
