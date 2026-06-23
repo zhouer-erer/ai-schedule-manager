@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 辅助任务行程安排管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <div id="login-container">
+            <div class="login-box">
+                <div class="login-header">
+                    <div class="logo">🤖</div>
+                    <h2>AI 任务管理系统</h2>
+                    <p>智能规划您的每一天</p>
+                </div>
+                
+                <div id="login-form">
+                    <input type="text" id="login-username" placeholder="用户名">
+                    <input type="password" id="login-password" placeholder="密码">
+                    <button id="login-btn" class="primary-btn">登录</button>
+                    <p class="switch-link" id="to-register">没有账号？立即注册</p>
+                </div>
+                
+                <div id="register-form" style="display: none;">
+                    <input type="text" id="reg-username" placeholder="用户名">
+                    <input type="email" id="reg-email" placeholder="邮箱">
+                    <input type="password" id="reg-password" placeholder="密码">
+                    <button id="register-btn" class="primary-btn">注册</button>
+                    <p class="switch-link" id="to-login">已有账号？立即登录</p>
+                </div>
+                
+                <p class="error-message" id="login-error"></p>
+            </div>
+        </div>
+
+        <div id="main-content">
+            <header>
+                <h1>AI 辅助任务行程安排管理系统</h1>
+                <div class="user-info">
+                    <span>欢迎, <span id="username"></span></span>
+                    <button id="logout-btn" class="logout-btn">退出登录</button>
+                </div>
+            </header>
+
+            <nav>
+                <button id="tab-all" class="active">任务管理</button>
+                <button id="tab-ai" class="ai-btn">🤖 AI智能规划</button>
+            </nav>
+
+            <main>
+                <div id="all-tab">
+                    <!-- 任务管理主区域 -->
+                    <div class="main-task-view">
+                        <div class="main-header">
+                            <h2>📅 任务行程管理规划</h2>
+                            <div class="action-buttons">
+                                <button id="add-task" class="add-btn">➕ 添加任务</button>
+                                <button id="add-trip" class="add-btn trip-btn">✈️ 添加行程</button>
+                                <button id="upload-file-btn" class="upload-btn">📁 上传文件</button>
+                                <button id="upload-image-btn" class="upload-btn">📷 图片识别</button>
+                            </div>
+                        </div>
+                        
+                        <!-- 分类标签 -->
+                        <div class="category-tabs">
+                            <button id="cat-all" class="cat-active">全部</button>
+                            <button id="cat-task">📅 任务</button>
+                            <button id="cat-trip">🧳 行程</button>
+                        </div>
+                        
+                        <!-- 时间过滤区域 -->
+                        <div class="time-filter-container" style="margin: 10px 0; display: flex; gap: 10px; align-items: center;">
+                            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                <input type="checkbox" id="hide-ended-tasks" style="width: 16px; height: 16px;">
+                                <span style="font-size: 14px; color: #666;">隐藏已结束的任务</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                <input type="checkbox" id="hide-ended-trips" style="width: 16px; height: 16px;">
+                                <span style="font-size: 14px; color: #666;">隐藏已结束的行程</span>
+                            </label>
+                        </div>
+                        
+                        <!-- 批量操作区域 -->
+                        <div class="batch-actions-container" id="batch-actions-container">
+                            <div class="batch-actions-left">
+                                <!-- 勾选控制按钮 -->
+                                <button id="batch-select-mode" class="btn btn-primary">
+                                    <span class="btn-icon">☐</span>
+                                    <span id="batch-select-text">批量选择</span>
+                                </button>
+                                <!-- 全选复选框 -->
+                                <label class="checkbox-label" id="select-all-label" style="display: none;">
+                                    <input type="checkbox" id="select-all-tasks">
+                                    <span>全选</span>
+                                </label>
+                                <!-- 批量删除按钮 -->
+                                <button id="batch-delete-tasks" class="btn btn-danger" disabled>
+                                    <span class="btn-icon">🗑️</span>
+                                    批量删除 <span class="badge">0</span>
+                                </button>
+                                <!-- 取消选择按钮 -->
+                                <button id="batch-cancel" class="btn" style="display: none; margin-left: 10px;">
+                                    取消选择
+                                </button>
+                            </div>
+                            <p id="batch-hint" style="font-size: 12px; color: #666; margin: 0; display: none;">
+                                请勾选要删除的任务或行程，然后点击批量删除（按ESC退出批量选择模式）
+                            </p>
+                        </div>
+                        
+                        <!-- 内容列表 - 网格视图 -->
+                        <div class="content-grid" id="content-grid">
+                            <div class="task-list-grid" id="task-list"></div>
+                        </div>
+                        
+                        <!-- 分页控制区域 -->
+                        <div class="pagination-container" id="pagination-container" style="display: none;">
+                            <div class="pagination-bottom">
+                                <div class="pagination-content">
+                                    <span class="pagination-total">共 <strong id="total-count">0</strong> 条记录</span>
+                                    <div class="pagination-controls-center">
+                                        <select id="per-page-select" class="per-page-select">
+                                            <option value="6">6条/页</option>
+                                            <option value="12">12条/页</option>
+                                            <option value="18">18条/页</option>
+                                            <option value="30">30条/页</option>
+                                        </select>
+                                        <div class="pagination-buttons-center">
+                                            <button id="prev-page" class="btn btn-secondary" disabled>
+                                                ← 上一页
+                                            </button>
+                                            <span class="page-info">第 <span id="current-page">1</span> / <span id="total-pages">1</span> 页</span>
+                                            <button id="next-page" class="btn btn-secondary" disabled>
+                                                下一页 →
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ai-tab" style="display: none;">
+                    <div class="ai-container">
+                        <div class="ai-header">
+                            <h2>🤖 AI智能规划助手</h2>
+                            <p>输入您的需求，AI将为您智能生成任务安排建议</p>
+                        </div>
+                        <div class="ai-input-area">
+                            <textarea id="ai-prompt" placeholder="例如：帮我安排下周的会议和健身计划，或者帮我规划一次旅行..."></textarea>
+                            <button id="ai-submit">智能规划</button>
+                        </div>
+                        <div class="ai-loading" id="ai-loading" style="display: none;">
+                            <div class="loading-spinner"></div>
+                            <p>AI正在分析您的需求...</p>
+                        </div>
+                        <div class="ai-analysis" id="ai-analysis"></div>
+                        <div class="ai-results" id="ai-results"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div id="task-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3 id="task-modal-title">添加任务</h3>
+                <div id="date-warning" style="display: none; background: #fff3cd; color: #856404; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 14px;"></div>
+                <input type="text" id="task-title" placeholder="标题">
+                <textarea id="task-description" placeholder="描述"></textarea>
+                <input type="datetime-local" id="task-start">
+                <input type="datetime-local" id="task-end">
+                <input type="text" id="task-location" placeholder="地点">
+                <select id="task-priority">
+                    <option value="1">低优先级</option>
+                    <option value="2">中优先级</option>
+                    <option value="3">高优先级</option>
+                </select>
+                <select id="task-category">
+                    <option value="personal">个人</option>
+                    <option value="work">工作</option>
+                    <option value="study">学习</option>
+                    <option value="social">社交</option>
+                </select>
+                <div class="modal-actions">
+                    <button id="save-task">保存</button>
+                    <button id="close-task-modal">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="trip-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3 id="trip-modal-title">添加行程</h3>
+                <input type="text" id="trip-title" placeholder="标题">
+                <textarea id="trip-description" placeholder="描述"></textarea>
+                <input type="text" id="trip-destination" placeholder="目的地">
+                <input type="date" id="trip-start">
+                <input type="date" id="trip-end">
+                <input type="number" id="trip-budget" placeholder="预算">
+                <div class="modal-actions">
+                    <button id="save-trip">保存</button>
+                    <button id="close-trip-modal">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="itinerary-modal" class="modal" style="display: none;">
+            <div class="modal-content itinerary-modal">
+                <div class="itinerary-header">
+                    <h3 id="itinerary-title">行程详情</h3>
+                    <button id="close-itinerary-modal" class="close-btn">&times;</button>
+                </div>
+                
+                <div class="itinerary-loading" id="itinerary-loading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <p>加载中...</p>
+                </div>
+                
+                <div id="itinerary-content" style="display: none;">
+                    <div class="itinerary-info-card">
+                        <div class="info-row">
+                            <div class="info-item">
+                                <span class="info-icon">🗓️</span>
+                                <span class="info-label">行程日期</span>
+                                <span id="itinerary-dates" class="info-value"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-icon">📍</span>
+                                <span class="info-label">目的地</span>
+                                <span id="itinerary-destination" class="info-value"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-icon">💰</span>
+                                <span class="info-label">预算</span>
+                                <span id="itinerary-budget" class="info-value"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-icon">📅</span>
+                                <span class="info-label">行程天数</span>
+                                <span id="itinerary-days" class="info-value"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="itinerary-description">
+                        <p id="itinerary-desc"></p>
+                    </div>
+                    
+                    <div class="itinerary-actions">
+                        <button id="add-itinerary-item" class="btn btn-primary">+ 添加行程项</button>
+                    </div>
+                    
+                    <div class="itinerary-timeline">
+                        <h4 class="timeline-title">📋 每日行程安排</h4>
+                        <div id="itinerary-list" class="timeline-list"></div>
+                        <div id="itinerary-empty" class="empty-state">
+                            <div class="empty-icon">📝</div>
+                            <p>暂无行程安排</p>
+                            <p class="empty-hint">点击上方按钮添加每日行程</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="file-upload-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>上传文件识别行程</h3>
+                <input type="file" id="file-input" accept=".txt,.md,.csv,.docx,.doc,.xlsx,.xls,.pdf,.json,.xml,.html">
+                <p>支持格式：.txt, .md, .csv, .docx, .doc, .xlsx, .xls, .pdf, .json, .xml, .html</p>
+                <div id="file-results"></div>
+                <div class="modal-actions">
+                    <button id="upload-file-submit">上传并识别</button>
+                    <button id="close-file-modal">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="image-upload-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>图片文字识别</h3>
+                <input type="file" id="image-input" accept="image/*">
+                <p>支持格式：JPG, PNG, GIF</p>
+                <img id="preview-image" style="max-width: 100%; display: none;">
+                <div id="image-results"></div>
+                <div class="modal-actions">
+                    <button id="upload-image-submit">识别文字</button>
+                    <button id="close-image-modal">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="suggestion-modal" class="modal" style="display: none;">
+            <div class="modal-content suggestion-modal">
+                <h3>确认保存建议</h3>
+                <div id="suggestion-details"></div>
+                <div class="modal-actions">
+                    <button id="save-suggestion">确认保存</button>
+                    <button id="close-suggestion-modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
